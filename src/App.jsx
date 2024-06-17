@@ -1,21 +1,6 @@
-import { Box, DragControls, Grid, Outlines, Plane } from "@react-three/drei";
+import { Box, Grid, Outlines, Plane } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
-import { useRef } from "react";
-
-function Draggable({ children }) {
-    const ref = useRef();
-
-    return (
-        <DragControls
-            ref={ref}
-            axisLock="y"
-            autoTransform={false}
-            onDrag={localMatrix => ref.current.matrix.copy(localMatrix)}
-        >
-            {children}
-        </DragControls>
-    );
-}
+import Draggable from "./Draggable";
 
 function App() {
     return (
