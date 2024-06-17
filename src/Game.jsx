@@ -34,11 +34,8 @@ function Game({}) {
             >
                 {buildings.map((type, index) => (
                     <Draggable key={index}>
-                        <Box
-                            args={[1, 1, 1]}
-                            material-color="red"
-                            position={[0, 0.5, 0]}
-                        >
+                        <Box args={[1, 1, 1]} position={[0, 0.5, 0]}>
+                            <meshBasicMaterial color="red" transparent={true} />
                             <Outlines />
                         </Box>
                     </Draggable>
