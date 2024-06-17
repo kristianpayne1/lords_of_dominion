@@ -1,6 +1,6 @@
 import { Box, Grid, Outlines, Plane } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
-import Draggable from "./Draggable";
+import Draggable, { DragContextProvider } from "./Draggable";
 
 function App() {
     return (
@@ -11,15 +11,19 @@ function App() {
                 rotation={[-Math.PI * 0.5, 0, 0]}
             />
             <Grid args={[10, 10]} cellColor={"white"} sectionColor={"grey"} />
-            <Draggable>
-                <Box
-                    args={[1, 1, 1]}
-                    material-color="red"
-                    position={[0, 0.5, 0]}
-                >
-                    <Outlines thickness={0.01} color="black" />
-                </Box>
-            </Draggable>
+            <DragContextProvider
+                dragLimits={[[-4.5, 4.5], undefined, [-4.5, 4.5]]}
+            >
+                <Draggable>
+                    <Box
+                        args={[1, 1, 1]}
+                        material-color="red"
+                        position={[0, 0.5, 0]}
+                    >
+                        <Outlines thickness={0.03} color="black" />
+                    </Box>
+                </Draggable>
+            </DragContextProvider>
         </Canvas>
     );
 }
