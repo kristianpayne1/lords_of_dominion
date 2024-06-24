@@ -1,9 +1,9 @@
-import { Grid, Plane } from "@react-three/drei";
+import { Bounds, Grid, Plane } from "@react-three/drei";
 import Buildings from "./Buildings";
 
 function Game({}) {
     return (
-        <>
+        <Bounds fit clip observe margin={1}>
             <Plane
                 args={[10, 10]}
                 material-color="green"
@@ -11,7 +11,7 @@ function Game({}) {
             />
             <Grid args={[10, 10]} cellColor={"white"} sectionColor={"grey"} />
             <Buildings />
-        </>
+        </Bounds>
     );
 }
 

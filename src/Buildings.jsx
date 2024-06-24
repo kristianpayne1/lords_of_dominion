@@ -1,38 +1,19 @@
-import { Box, Outlines, useKeyboardControls } from "@react-three/drei";
+import { Box, Outlines } from "@react-three/drei";
 import Draggable, { DragContextProvider } from "./Draggable";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import useGameControls from "./useGameControls";
 
 function Buildings({ isEditMode = true }) {
     const [isAddMode, setIsAddMode] = useState(false);
     const [buildings, setBuildings] = useState([]);
-    const [sub] = useKeyboardControls();
 
-    useEffect(() => {
-        return sub(
-            state => state.addMode,
-            pressed => {
-                if (pressed) setIsAddMode(true);
-            },
-        );
-    }, []);
-
-    useEffect(() => {
-        return sub(
-            state => state.escape,
-            pressed => {
-                if (pressed) setIsAddMode(false);
-            },
-        );
-    });
-
-    useEffect(() => {
-        return sub(
-            state => state.option1,
-            pressed => {
-                if (pressed && isAddMode)
-                    setBuildings(state => [...state, "house"]);
-            },
-        );
+    useGameControls({
+        keyCallbacks: {
+            q: () => setIsAddMode(true),
+            escape: () => setIsAddMode(false),
+            option1: () =>
+                isAddMode && setBuildings(state => [...state, "house"]),
+        },
     });
 
     return (
