@@ -8,6 +8,7 @@ function App() {
         <KeyboardControls map={controlMap}>
             <Canvas orthographic camera={{ zoom: 100, position: [10, 10, 10] }}>
                 <Game />
+                <ambientLight intensity={1} />
             </Canvas>
         </KeyboardControls>
     );

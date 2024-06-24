@@ -1,4 +1,4 @@
-import { DragControls } from "@react-three/drei";
+import { Box, DragControls } from "@react-three/drei";
 import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { Box3, Matrix4, Vector3 } from "three";
 
@@ -28,8 +28,9 @@ export function DragContextProvider({ children, ...dragConfig }) {
     );
 }
 
-function Draggable({ children, enabled = true }) {
+function Draggable({ children, enabled = true, ...props }) {
     const ref = useRef();
+    const hitBoxRef = useRef();
     const { objects, addObject, removeObject, dragConfig } =
         useContext(DragContext);
 
@@ -37,7 +38,10 @@ function Draggable({ children, enabled = true }) {
     const previousMatrix = new Matrix4();
 
     const setOpacity = (obj, opacity) => {
-        obj.children.forEach(child => setOpacity(child, opacity));
+        obj.children.forEach(child => {
+            if (child.userData.hitBox) return;
+            setOpacity(child, opacity);
+        });
         if (obj.material) obj.material.opacity = opacity;
     };
 
@@ -74,7 +78,7 @@ function Draggable({ children, enabled = true }) {
             }}
             onDragEnd={() => {
                 // check if any objects are colliding
-                const thisBox = new Box3().setFromObject(ref.current);
+                const thisBox = new Box3().setFromObject(hitBoxRef.current);
                 const otherBox = new Box3();
                 const collides = objects.some(
                     object =>
@@ -86,6 +90,15 @@ function Draggable({ children, enabled = true }) {
             }}
             {...dragConfig}
         >
+            <group {...props}>
+                <Box
+                    ref={hitBoxRef}
+                    args={[1, 1, 1]}
+                    userData={{ hitBox: true }}
+                >
+                    <meshBasicMaterial transparent={true} opacity={0} />
+                </Box>
+            </group>
             {children}
         </DragControls>
     );
