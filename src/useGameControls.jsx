@@ -7,6 +7,23 @@ export const controlMap = [
     { name: "escape", keys: ["Escape"] },
 ];
 
+export function simulateKeyStroke(strokes) {
+    if (!Array.isArray(strokes) || !strokes.length) return;
+    strokes.forEach((keyName, index) => {
+        const control = controlMap.find(({ name }) => name === keyName);
+        setTimeout(() => {
+            requestAnimationFrame(() => {
+                window.dispatchEvent(
+                    new KeyboardEvent("keydown", { key: control.keys[0] }),
+                );
+                window.dispatchEvent(
+                    new KeyboardEvent("keyup", { key: control.keys[0] }),
+                );
+            });
+        }, index * 100);
+    });
+}
+
 function useGameControls({ keyCallbacks = {} }) {
     const [sub] = useKeyboardControls();
 

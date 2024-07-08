@@ -3,7 +3,7 @@ import Buildings from "./Buildings";
 
 function Game({}) {
     return (
-        <Bounds fit clip observe margin={0.75}>
+        <Bounds fit clip observe margin={1}>
             <Plane
                 args={[10, 10]}
                 rotation={[-Math.PI * 0.5, 0, 0]}

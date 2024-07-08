@@ -4,3 +4,7 @@ div#root {
     margin: 0;
     height: 100%;
 }
+
+canvas {
+    background: #82bbc9;
+}

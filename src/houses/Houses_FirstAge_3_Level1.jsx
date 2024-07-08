@@ -14,6 +14,7 @@ function FirstAge_3_Level1({ ...props }) {
             <mesh
                 geometry={nodes.Cube242_1.geometry}
                 material={materials.Wood_Light}
+                material-roughness={0}
                 castShadow
             />
         </group>
