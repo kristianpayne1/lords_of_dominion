@@ -9,10 +9,12 @@ function FirstAge_2_Level1({ ...props }) {
             <mesh
                 geometry={nodes.Cube241.geometry}
                 material={materials.Stone}
+                castShadow
             />
             <mesh
                 geometry={nodes.Cube241_1.geometry}
                 material={materials.Wood}
+                castShadow
             />
         </group>
     );

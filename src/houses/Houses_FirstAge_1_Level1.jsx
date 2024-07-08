@@ -6,10 +6,16 @@ function FirstAge_1_Level1({ ...props }) {
     const { nodes, materials } = useGLTF(url);
     return (
         <group {...props}>
-            <mesh geometry={nodes.Cube030.geometry} material={materials.Wood} />
+            <mesh
+                geometry={nodes.Cube030.geometry}
+                material={materials.Wood}
+                material-roughness={0}
+                castShadow
+            />
             <mesh
                 geometry={nodes.Cube030_1.geometry}
                 material={materials.Stone}
+                castShadow
             />
         </group>
     );

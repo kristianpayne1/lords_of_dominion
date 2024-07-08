@@ -1,15 +1,16 @@
-import { Bounds, Grid, Plane } from "@react-three/drei";
+import { Bounds, Plane } from "@react-three/drei";
 import Buildings from "./Buildings";
 
 function Game({}) {
     return (
-        <Bounds fit clip observe margin={1}>
+        <Bounds fit clip observe margin={0.75}>
             <Plane
                 args={[10, 10]}
-                material-color="green"
                 rotation={[-Math.PI * 0.5, 0, 0]}
-            />
-            <Grid args={[10, 10]} cellColor={"white"} sectionColor={"grey"} />
+                receiveShadow
+            >
+                <meshStandardMaterial color="#99ac49" />
+            </Plane>
             <Buildings />
         </Bounds>
     );
