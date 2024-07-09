@@ -25,7 +25,7 @@ function App() {
                     />
                     <hemisphereLight
                         skyColor="blue"
-                        groundColor="#c99ac49"
+                        groundColor="#99ac49"
                         intensity={0.5}
                     />
                 </Canvas>
