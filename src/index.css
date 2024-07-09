@@ -7,4 +7,5 @@ div#root {
 
 canvas {
     background: #82bbc9;
+    touch-action: none;
 }

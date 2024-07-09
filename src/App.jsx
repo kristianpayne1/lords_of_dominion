@@ -1,18 +1,13 @@
 import { KeyboardControls } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import Game from "./Game";
-import { controlMap, simulateKeyStroke } from "./useGameControls";
+import { controlMap } from "./useGameControls";
 import "./App.css";
 
 function HUD() {
     return (
         <div id="hud">
-            <button
-                id="add-button"
-                onClick={() => {
-                    simulateKeyStroke(["q", "option1", "escape"]);
-                }}
-            >
+            <button id="add-button" onClick={() => {}}>
                 Add house
             </button>
         </div>
