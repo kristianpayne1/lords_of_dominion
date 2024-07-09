@@ -1,6 +1,7 @@
 import { Box, DragControls } from "@react-three/drei";
 import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { Box3, Matrix4, Vector3 } from "three";
+import { ControlsContext } from "./Controls";
 
 const DragContext = createContext({
     objects: [],
@@ -33,6 +34,7 @@ function Draggable({ children, enabled = true, ...props }) {
     const hitBoxRef = useRef();
     const { objects, addObject, removeObject, dragConfig } =
         useContext(DragContext);
+    const controlsRef = useContext(ControlsContext);
 
     const localPosition = new Vector3();
     const previousMatrix = new Matrix4();
@@ -73,10 +75,12 @@ function Draggable({ children, enabled = true, ...props }) {
             }}
             onDragStart={() => {
                 if (!enabled) return;
+                controlsRef.current.enabled = false;
                 previousMatrix.copy(ref.current.matrix);
                 setOpacity(ref.current, 0.6);
             }}
             onDragEnd={() => {
+                controlsRef.current.enabled = true;
                 // check if any objects are colliding
                 const thisBox = new Box3().setFromObject(hitBoxRef.current);
                 const otherBox = new Box3();
