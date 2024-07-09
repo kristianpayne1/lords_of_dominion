@@ -10,7 +10,7 @@ export const buildingsSlice = createSlice({
         addBuilding: (state, { payload = {} }) => {
             const {
                 type = HOUSE,
-                variant = Math.floor(Math.random() * 2) + 1,
+                variant = Math.round(Math.random() * 2) + 1,
                 level = 1,
             } = payload;
             state.push({ variant, level, type });
