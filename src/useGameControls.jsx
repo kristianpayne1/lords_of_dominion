@@ -1,12 +1,6 @@
 import { useKeyboardControls } from "@react-three/drei";
 import { useEffect } from "react";
 
-export const controlMap = [
-    { name: "q", keys: ["q", "Q"] },
-    { name: "option1", keys: ["1"] },
-    { name: "escape", keys: ["Escape"] },
-];
-
 function useGameControls({ keyCallbacks = {} }) {
     const [sub] = useKeyboardControls();
 

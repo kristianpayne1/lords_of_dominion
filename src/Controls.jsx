@@ -1,6 +1,11 @@
 import { createContext, useRef } from "react";
-import { controlMap } from "./useGameControls";
 import { KeyboardControls, MapControls } from "@react-three/drei";
+
+export const controlMap = [
+    { name: "q", keys: ["q", "Q"] },
+    { name: "option1", keys: ["1"] },
+    { name: "escape", keys: ["Escape"] },
+];
 
 export const ControlsContext = createContext(null);
 
