@@ -8,8 +8,8 @@ const housesMap = {
     FirstAge_3_Level1,
 };
 
-function House({ age = "FirstAge", level = 1, type = 1, ...props }) {
-    const Model = housesMap[`${age}_${type}_Level${level}`];
+function House({ age = "FirstAge", level = 1, variant = 1, ...props }) {
+    const Model = housesMap[`${age}_${variant}_Level${level}`];
     return <Model {...props} />;
 }
 
