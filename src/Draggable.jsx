@@ -1,4 +1,4 @@
-import { Box, DragControls } from "@react-three/drei";
+import { Box, DragControls, useCursor } from "@react-three/drei";
 import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { Box3, Matrix4, Vector3 } from "three";
 import { ControlsContext } from "./Controls";
@@ -35,6 +35,11 @@ function Draggable({ children, enabled = true, ...props }) {
     const { objects, addObject, removeObject, dragConfig } =
         useContext(DragContext);
     const controlsRef = useContext(ControlsContext);
+    const [hovered, setHovered] = useState(false);
+    const [dragging, setDragging] = useState(false);
+
+    useCursor(hovered, "grab", "auto");
+    useCursor(dragging, "grabbing", hovered ? "grab" : "auto");
 
     const localPosition = new Vector3();
     const previousMatrix = new Matrix4();
@@ -75,12 +80,14 @@ function Draggable({ children, enabled = true, ...props }) {
             }}
             onDragStart={() => {
                 if (!enabled) return;
+                setDragging(true);
                 controlsRef.current.enabled = false;
                 previousMatrix.copy(ref.current.matrix);
                 setOpacity(ref.current, 0.6);
             }}
             onDragEnd={() => {
                 controlsRef.current.enabled = true;
+                setDragging(false);
                 // check if any objects are colliding
                 const thisBox = new Box3().setFromObject(hitBoxRef.current);
                 const otherBox = new Box3();
@@ -99,6 +106,8 @@ function Draggable({ children, enabled = true, ...props }) {
                     ref={hitBoxRef}
                     args={[1, 1, 1]}
                     userData={{ hitBox: true }}
+                    onPointerOver={() => setHovered(true)}
+                    onPointerOut={() => setHovered(false)}
                 >
                     <meshBasicMaterial transparent={true} opacity={0} />
                 </Box>
