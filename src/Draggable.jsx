@@ -44,14 +44,6 @@ function Draggable({ children, enabled = true, ...props }) {
     const localPosition = new Vector3();
     const previousMatrix = new Matrix4();
 
-    const setOpacity = (obj, opacity) => {
-        obj.children.forEach(child => {
-            if (child.userData.hitBox) return;
-            setOpacity(child, opacity);
-        });
-        if (obj.material) obj.material.opacity = opacity;
-    };
-
     useEffect(() => {
         if (!ref.current) return;
         addObject(ref.current);
@@ -83,7 +75,6 @@ function Draggable({ children, enabled = true, ...props }) {
                 setDragging(true);
                 controlsRef.current.enabled = false;
                 previousMatrix.copy(ref.current.matrix);
-                setOpacity(ref.current, 0.6);
             }}
             onDragEnd={() => {
                 controlsRef.current.enabled = true;
@@ -97,7 +88,6 @@ function Draggable({ children, enabled = true, ...props }) {
                         thisBox.intersectsBox(otherBox.setFromObject(object)),
                 );
                 if (collides) ref.current.matrix.copy(previousMatrix);
-                setOpacity(ref.current, 1);
             }}
             {...dragConfig}
         >

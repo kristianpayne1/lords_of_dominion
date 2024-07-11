@@ -5,6 +5,7 @@ import House from "./House";
 import { useDispatch, useSelector } from "react-redux";
 import { addBuilding } from "./reducers/buildingsSlice";
 import { HOUSE } from "./houses/types";
+import { Plane } from "@react-three/drei";
 
 function Building({ type, ...props }) {
     switch (type) {
@@ -36,6 +37,18 @@ function Buildings({ isEditMode = true, age = "FirstAge" }) {
                 {buildings.map((props, index) => (
                     <Draggable key={index} position={[0, 0.5, 0]}>
                         <Building age={age} {...props} />
+                        <Plane
+                            args={[1.5, 1.5]}
+                            rotation={[-Math.PI * 0.5, 0, 0]}
+                            position={[0, 0.01, 0]}
+                            receiveShadow
+                        >
+                            <meshStandardMaterial
+                                transparent
+                                opacity={0.3}
+                                color="white"
+                            />
+                        </Plane>
                     </Draggable>
                 ))}
             </Suspense>
