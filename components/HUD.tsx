@@ -1,5 +1,5 @@
 import React from "react";
-import { addBuilding } from "./reducers/buildingsSlice";
+import { addBuilding } from "../../src/reducers/buildingsSlice";
 import { useDispatch } from "react-redux";
 
 function HUD() {

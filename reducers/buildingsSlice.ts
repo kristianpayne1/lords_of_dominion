@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { HOUSE } from "../houses/types";
+import { HOUSE } from "../components/houses/types";
 
 const initialState = [];
 

@@ -1,9 +1,9 @@
 import Draggable, { DragContextProvider } from "./Draggable";
 import { Suspense, useState } from "react";
-import useGameControls from "./useGameControls";
+import useGameControls from "../hooks/useGameControls";
 import House from "./House";
 import { useDispatch, useSelector } from "react-redux";
-import { addBuilding } from "./reducers/buildingsSlice";
+import { addBuilding } from "../../src/reducers/buildingsSlice";
 import { HOUSE } from "./houses/types";
 import { Plane } from "@react-three/drei";
 
