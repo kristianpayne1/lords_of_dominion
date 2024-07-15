@@ -8,9 +8,18 @@ const housesMap = {
     FirstAge_3_Level1,
 };
 
+function isValidHouseKey(key: string): key is keyof typeof housesMap {
+    return key in housesMap;
+}
+
 function House({ age = "FirstAge", level = 1, variant = 1, ...props }) {
-    const Model = housesMap[`${age}_${variant}_Level${level}`];
-    return <Model {...props} />;
+    const key = `${age}_${variant}_Level${level}`;
+    if (isValidHouseKey(key)) {
+        const Model = housesMap[key];
+        return <Model {...props} />;
+    } else {
+        return null;
+    }
 }
 
 export default House;

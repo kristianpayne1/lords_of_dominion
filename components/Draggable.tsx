@@ -1,24 +1,47 @@
 import { Box, DragControls, useCursor } from "@react-three/drei";
-import { createContext, useContext, useEffect, useRef, useState } from "react";
-import { Box3, Matrix4, Vector3 } from "three";
+import {
+    createContext,
+    type PropsWithChildren,
+    useContext,
+    useEffect,
+    useRef,
+    useState,
+} from "react";
+import { Box3, type Group, Matrix4, type Mesh, Vector3 } from "three";
 import { ControlsContext } from "./Controls";
+import { DragConfig } from "@/types";
 
-const DragContext = createContext({
+type DragContextValue = {
+    objects: Array<Group>;
+    addObject: (object: Group | undefined) => void;
+    removeObject: (object: Group | undefined) => void;
+    dragConfig?: DragConfig;
+};
+
+const DragContext = createContext<DragContextValue>({
     objects: [],
     addObject: () => {},
     removeObject: () => {},
 });
 
-function roundHalf(num) {
+function roundHalf(num: number) {
     return Math.round(num * 2) / 2;
 }
 
-export function DragContextProvider({ children, ...dragConfig }) {
-    const [objects, setObjects] = useState([]);
+export function DragContextProvider({
+    children,
+    ...dragConfig
+}: PropsWithChildren) {
+    const [objects, setObjects] = useState<Array<Group>>([]);
 
-    const addObject = object => setObjects(state => [...state, object]);
-    const removeObject = object =>
-        setObjects(state => state.filter(obj => obj.uuid !== object?.uuid));
+    const addObject = (object: Group | undefined) => {
+        if (!object) return;
+        setObjects((state: Array<Group>) => [...state, object]);
+    };
+    const removeObject = (object: Group | undefined) =>
+        setObjects(state =>
+            state.filter((obj: Group) => obj.uuid !== object?.uuid),
+        );
 
     return (
         <DragContext.Provider
@@ -29,9 +52,17 @@ export function DragContextProvider({ children, ...dragConfig }) {
     );
 }
 
-function Draggable({ children, enabled = true, ...props }) {
-    const ref = useRef();
-    const hitBoxRef = useRef();
+function Draggable({
+    children,
+    enabled = true,
+    position,
+    ...props
+}: PropsWithChildren & {
+    enabled?: boolean;
+    position?: [x: number, y: number, z: number] | Vector3;
+}) {
+    const ref = useRef<typeof DragControls & Group>(null!);
+    const hitBoxRef = useRef<Mesh>(null!);
     const { objects, addObject, removeObject, dragConfig } =
         useContext(DragContext);
     const controlsRef = useContext(ControlsContext);
@@ -58,7 +89,7 @@ function Draggable({ children, enabled = true, ...props }) {
             axisLock="y"
             autoTransform={false}
             onDrag={localMatrix => {
-                if (!enabled) return;
+                if (!enabled || !ref.current) return;
                 // clamp position to half
                 localPosition.setFromMatrixPosition(localMatrix);
                 localPosition.set(
@@ -71,12 +102,13 @@ function Draggable({ children, enabled = true, ...props }) {
                 );
             }}
             onDragStart={() => {
-                if (!enabled) return;
+                if (!enabled || !ref.current) return;
                 setDragging(true);
                 controlsRef.current.enabled = false;
                 previousMatrix.copy(ref.current.matrix);
             }}
             onDragEnd={() => {
+                if (!hitBoxRef.current || !ref.current) return;
                 controlsRef.current.enabled = true;
                 setDragging(false);
                 // check if any objects are colliding
@@ -84,14 +116,14 @@ function Draggable({ children, enabled = true, ...props }) {
                 const otherBox = new Box3();
                 const collides = objects.some(
                     object =>
-                        object.uuid !== ref.current.uuid &&
+                        object.uuid !== ref.current?.uuid &&
                         thisBox.intersectsBox(otherBox.setFromObject(object)),
                 );
                 if (collides) ref.current.matrix.copy(previousMatrix);
             }}
             {...dragConfig}
         >
-            <group {...props}>
+            <group {...{ position, ...props }}>
                 <Box
                     ref={hitBoxRef}
                     args={[1, 1, 1]}

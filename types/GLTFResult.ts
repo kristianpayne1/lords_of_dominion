@@ -1,4 +1,4 @@
-import { Mesh, Material } from "three";
+import { type Mesh, type Material } from "three";
 
 export type GLTFResult = {
     nodes: {

@@ -1,7 +1,7 @@
+import { BuildingState, BuildingTypes } from "@/types";
 import { createSlice } from "@reduxjs/toolkit";
-import { HOUSE } from "../components/houses/types";
 
-const initialState = [];
+const initialState: BuildingState = [];
 
 export const buildingsSlice = createSlice({
     name: "buildings",
@@ -9,7 +9,7 @@ export const buildingsSlice = createSlice({
     reducers: {
         addBuilding: (state, { payload = {} }) => {
             const {
-                type = HOUSE,
+                type = BuildingTypes,
                 variant = Math.round(Math.random() * 2) + 1,
                 level = 1,
             } = payload;

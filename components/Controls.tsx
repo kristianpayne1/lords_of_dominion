@@ -1,4 +1,4 @@
-import { createContext, useRef } from "react";
+import { createContext, useRef, type PropsWithChildren } from "react";
 import { KeyboardControls, MapControls } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import { Vector3 } from "three";
@@ -9,16 +9,16 @@ export const controlMap = [
     { name: "escape", keys: ["Escape"] },
 ];
 
-export const ControlsContext = createContext(null);
+export const ControlsContext = createContext<any>(null);
 
 const minPan = new Vector3(-5, -5, -5);
 const maxPan = new Vector3(5, 5, 5);
 
-export default function Controls({ children }) {
-    const controlsRef = useRef();
+export default function Controls({ children }: PropsWithChildren) {
+    const controlsRef = useRef<any>(null);
 
     useFrame(() => {
-        if (!controlsRef.current) return;
+        if (!controlsRef.current && !controlsRef.current?.target) return;
         controlsRef.current.target.clamp(minPan, maxPan);
     });
 

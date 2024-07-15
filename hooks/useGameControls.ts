@@ -1,11 +1,6 @@
 import { useKeyboardControls } from "@react-three/drei";
 import { useEffect } from "react";
-
-type KeyMapping = {
-    q?: () => void;
-    escape?: () => {};
-    option1?: () => {};
-};
+import { KeyMapping } from "@/types";
 
 function useGameControls({ keyCallbacks = {} }: { keyCallbacks: KeyMapping }) {
     const [sub] = useKeyboardControls();

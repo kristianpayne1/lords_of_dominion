@@ -7,7 +7,7 @@ function HUD() {
 
     return (
         <div id="hud">
-            <button id="add-button" onClick={() => dispatch(addBuilding())}>
+            <button id="add-button" onClick={() => dispatch(addBuilding({}))}>
                 Add house
             </button>
         </div>
