@@ -1,16 +1,17 @@
-import React from "react";
+import { View } from "react-native";
 import { addBuilding } from "../reducers/buildingsSlice";
 import { useDispatch } from "react-redux";
+import Button from "./Button";
 
 function HUD() {
     const dispatch = useDispatch();
 
     return (
-        <div id="hud">
-            <button id="add-button" onClick={() => dispatch(addBuilding({}))}>
-                Add house
-            </button>
-        </div>
+        <View>
+            <Button onPress={() => dispatch(addBuilding({}))}>
+                Build Building
+            </Button>
+        </View>
     );
 }
 

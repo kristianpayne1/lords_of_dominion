@@ -9,7 +9,7 @@ export const buildingsSlice = createSlice({
     reducers: {
         addBuilding: (state, { payload = {} }) => {
             const {
-                type = BuildingTypes,
+                type = BuildingTypes.House,
                 variant = Math.round(Math.random() * 2) + 1,
                 level = 1,
             } = payload;

@@ -1,4 +1,4 @@
-import { Bounds, Plane } from "@react-three/drei";
+import { Bounds, Plane } from "@react-three/drei/native";
 import Buildings from "./Buildings";
 
 function Game({}) {

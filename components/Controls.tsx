@@ -1,13 +1,7 @@
 import { createContext, useRef, type PropsWithChildren } from "react";
-import { KeyboardControls, MapControls } from "@react-three/drei";
+import { MapControls } from "@react-three/drei/native";
 import { useFrame } from "@react-three/fiber";
 import { Vector3 } from "three";
-
-export const controlMap = [
-    { name: "q", keys: ["q", "Q"] },
-    { name: "option1", keys: ["1"] },
-    { name: "escape", keys: ["Escape"] },
-];
 
 export const ControlsContext = createContext<any>(null);
 
@@ -24,18 +18,16 @@ export default function Controls({ children }: PropsWithChildren) {
 
     return (
         <ControlsContext.Provider value={controlsRef}>
-            <KeyboardControls map={controlMap}>
-                <MapControls
-                    ref={controlsRef}
-                    maxZoom={200}
-                    minZoom={50}
-                    maxAzimuthAngle={Math.PI / 4}
-                    minAzimuthAngle={Math.PI / 4}
-                    maxPolarAngle={Math.PI / 3.29}
-                    minPolarAngle={Math.PI / 3.29}
-                />
-                {children}
-            </KeyboardControls>
+            <MapControls
+                ref={controlsRef}
+                maxZoom={200}
+                minZoom={50}
+                maxAzimuthAngle={Math.PI / 4}
+                minAzimuthAngle={Math.PI / 4}
+                maxPolarAngle={Math.PI / 3.29}
+                minPolarAngle={Math.PI / 3.29}
+            />
+            {children}
         </ControlsContext.Provider>
     );
 }

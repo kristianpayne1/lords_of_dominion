@@ -1,11 +1,9 @@
 import Draggable, { DragContextProvider } from "./Draggable";
-import { Suspense, useState } from "react";
-import useGameControls from "../hooks/useGameControls";
+import { Suspense } from "react";
 import House from "./House";
 import { useDispatch, useSelector } from "react-redux";
-import { addBuilding } from "../reducers/buildingsSlice";
-import { Plane } from "@react-three/drei";
-import { Building, BuildingTypes, State } from "@/types";
+import { Plane } from "@react-three/drei/native";
+import { BuildingType, BuildingTypes, State } from "@/types";
 
 function Building({ type, ...props }: { type: BuildingTypes }) {
     switch (type) {
@@ -17,26 +15,14 @@ function Building({ type, ...props }: { type: BuildingTypes }) {
 function Buildings({ isEditMode = true, age = "FirstAge" }) {
     const dispatch = useDispatch();
 
-    const [isAddMode, setIsAddMode] = useState(false);
     const buildings = useSelector((state: State) => state.buildings);
-
-    useGameControls({
-        keyCallbacks: {
-            q: () => setIsAddMode(true),
-            escape: () => setIsAddMode(false),
-            option1: () => {
-                if (!isAddMode) return;
-                return dispatch(addBuilding({ type: "HOUSE", level: 1 }));
-            },
-        },
-    });
 
     return (
         <DragContextProvider
             {...{ dragLimits: [[-4.5, 4.5], undefined, [-4.5, 4.5]] }}
         >
             <Suspense>
-                {buildings.map((props: Building, index: number) => (
+                {buildings.map((props: BuildingType, index: number) => (
                     <Draggable {...{ key: index, position: [0, 0.5, 0] }}>
                         <Building {...{ age, ...props }} />
                         <Plane
