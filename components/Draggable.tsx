@@ -8,7 +8,6 @@ import {
     useState,
 } from "react";
 import { Box3, type Group, Matrix4, type Mesh, Vector3 } from "three";
-import { ControlsContext } from "./Controls";
 import { DragConfig } from "@/types";
 import { DragControls } from "./DragControls";
 import {
@@ -51,7 +50,7 @@ export function DragContextProvider({
             state.filter((obj: Group) => obj.uuid !== object?.uuid),
         );
 
-    const gesture = Gesture.Pan();
+    const gesture = Gesture.Pan().onUpdate(console.log);
 
     return (
         <DragContext.Provider
