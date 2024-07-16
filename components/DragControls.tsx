@@ -1,8 +1,14 @@
-import * as React from "react";
+import {
+    useRef,
+    useImperativeHandle,
+    useLayoutEffect,
+    forwardRef,
+    useCallback,
+} from "react";
 import * as THREE from "three";
 import { useThree } from "@react-three/fiber";
-import { useGesture, DragConfig } from "@use-gesture/react";
 import { ForwardRefComponent } from "@react-three/drei/helpers/ts-utils";
+import { PanGesture } from "react-native-gesture-handler";
 
 const initialModelPosition = new THREE.Vector3();
 const mousePosition2D = new THREE.Vector2();
@@ -28,8 +34,7 @@ export type DragControlsProps = {
         [number, number] | undefined,
         [number, number] | undefined,
     ];
-    /** Hover event */
-    onHover?: (hovering: boolean) => void;
+    gesture: PanGesture | null;
     /** Drag start event */
     onDragStart?: (origin: THREE.Vector3) => void;
     /** Drag event */
@@ -41,23 +46,21 @@ export type DragControlsProps = {
     ) => void /** Drag end event */;
     onDragEnd?: () => void;
     children: React.ReactNode;
-    dragConfig?: DragConfig;
 };
 
 export const DragControls: ForwardRefComponent<DragControlsProps, THREE.Group> =
-    React.forwardRef<THREE.Group, DragControlsProps>(
+    forwardRef<THREE.Group, DragControlsProps>(
         (
             {
                 autoTransform = true,
                 matrix,
                 axisLock,
                 dragLimits,
-                onHover,
+                gesture,
                 onDragStart,
                 onDrag,
                 onDragEnd,
                 children,
-                dragConfig,
                 ...props
             },
             fRef,
@@ -66,63 +69,66 @@ export const DragControls: ForwardRefComponent<DragControlsProps, THREE.Group> =
                 state => (state as any).controls,
             ) as ControlsProto | undefined;
             const { camera, size, raycaster, invalidate } = useThree();
-            const ref = React.useRef<THREE.Group>(null!);
+            const ref = useRef<THREE.Group>(null!);
 
-            const bind = useGesture(
-                {
-                    onHover: ({ hovering }) =>
-                        onHover && onHover(hovering ?? false),
-                    onDragStart: ({ event }) => {
+            const dragging = useRef(false);
+
+            const updateMousePosition3D = useCallback(
+                (x: number, y: number) => {
+                    const normalizedMouseX =
+                        ((x - size.left) / size.width) * 2 - 1;
+                    const normalizedMouseY =
+                        -((y - size.top) / size.height) * 2 + 1;
+
+                    mousePosition2D.set(normalizedMouseX, normalizedMouseY);
+                    raycaster.setFromCamera(mousePosition2D, camera);
+
+                    if (!axisLock) {
+                        camera.getWorldDirection(dragPlaneNormal).negate();
+                    } else {
+                        switch (axisLock) {
+                            case "x":
+                                dragPlaneNormal.set(1, 0, 0);
+                                break;
+                            case "y":
+                                dragPlaneNormal.set(0, 1, 0);
+                                break;
+                            case "z":
+                                dragPlaneNormal.set(0, 0, 1);
+                                break;
+                        }
+                    }
+
+                    dragPlane.setFromNormalAndCoplanarPoint(
+                        dragPlaneNormal,
+                        mousePosition3D,
+                    );
+                    raycaster.ray.intersectPlane(dragPlane, mousePosition3D);
+                },
+                [size, axisLock],
+            );
+
+            if (gesture)
+                gesture
+                    .onStart(({ x, y }) => {
                         if (defaultControls) defaultControls.enabled = false;
-                        const { point } = event as any;
+
+                        updateMousePosition3D(x, y);
 
                         ref.current.matrix.decompose(
                             initialModelPosition,
                             new THREE.Quaternion(),
                             new THREE.Vector3(),
                         );
-                        mousePosition3D.copy(point);
                         dragOffset
                             .copy(mousePosition3D)
                             .sub(initialModelPosition);
 
                         onDragStart && onDragStart(initialModelPosition);
                         invalidate();
-                    },
-                    onDrag: ({ xy: [dragX, dragY], intentional }) => {
-                        if (!intentional) return;
-                        const normalizedMouseX =
-                            ((dragX - size.left) / size.width) * 2 - 1;
-                        const normalizedMouseY =
-                            -((dragY - size.top) / size.height) * 2 + 1;
-
-                        mousePosition2D.set(normalizedMouseX, normalizedMouseY);
-                        raycaster.setFromCamera(mousePosition2D, camera);
-
-                        if (!axisLock) {
-                            camera.getWorldDirection(dragPlaneNormal).negate();
-                        } else {
-                            switch (axisLock) {
-                                case "x":
-                                    dragPlaneNormal.set(1, 0, 0);
-                                    break;
-                                case "y":
-                                    dragPlaneNormal.set(0, 1, 0);
-                                    break;
-                                case "z":
-                                    dragPlaneNormal.set(0, 0, 1);
-                                    break;
-                            }
-                        }
-
-                        dragPlane.setFromNormalAndCoplanarPoint(
-                            dragPlaneNormal,
-                            mousePosition3D,
-                        );
-                        raycaster.ray.intersectPlane(
-                            dragPlane,
-                            mousePosition3D,
-                        );
+                    })
+                    .onUpdate(({ x, y }) => {
+                        updateMousePosition3D(x, y);
 
                         const previousLocalMatrix = ref.current.matrix.clone();
                         const previousWorldMatrix =
@@ -203,26 +209,19 @@ export const DragControls: ForwardRefComponent<DragControlsProps, THREE.Group> =
                                 );
                         }
                         invalidate();
-                    },
-                    onDragEnd: () => {
+                    })
+                    .onEnd(() => {
                         if (defaultControls) defaultControls.enabled = true;
+
+                        dragging.current = false;
 
                         onDragEnd && onDragEnd();
                         invalidate();
-                    },
-                },
-                {
-                    drag: {
-                        filterTaps: true,
-                        threshold: 1,
-                        ...(typeof dragConfig === "object" ? dragConfig : {}),
-                    },
-                },
-            );
+                    });
 
-            React.useImperativeHandle(fRef, () => ref.current, []);
+            useImperativeHandle(fRef, () => ref.current, []);
 
-            React.useLayoutEffect(() => {
+            useLayoutEffect(() => {
                 if (!matrix) return;
 
                 // If the matrix is a real matrix4 it means that the user wants to control the gizmo
@@ -233,7 +232,6 @@ export const DragControls: ForwardRefComponent<DragControlsProps, THREE.Group> =
             return (
                 <group
                     ref={ref}
-                    {...(bind() as any)}
                     matrix={matrix}
                     matrixAutoUpdate={false}
                     {...props}

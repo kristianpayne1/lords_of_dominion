@@ -11,18 +11,25 @@ import { Box3, type Group, Matrix4, type Mesh, Vector3 } from "three";
 import { ControlsContext } from "./Controls";
 import { DragConfig } from "@/types";
 import { DragControls } from "./DragControls";
+import {
+    Gesture,
+    GestureDetector,
+    PanGesture,
+} from "react-native-gesture-handler";
 
 type DragContextValue = {
     objects: Array<Group>;
     addObject: (object: Group | undefined) => void;
     removeObject: (object: Group | undefined) => void;
     dragConfig?: DragConfig;
+    gesture: PanGesture | null;
 };
 
 const DragContext = createContext<DragContextValue>({
     objects: [],
     addObject: () => {},
     removeObject: () => {},
+    gesture: null,
 });
 
 function roundHalf(num: number) {
@@ -44,11 +51,13 @@ export function DragContextProvider({
             state.filter((obj: Group) => obj.uuid !== object?.uuid),
         );
 
+    const gesture = Gesture.Pan();
+
     return (
         <DragContext.Provider
-            value={{ objects, addObject, removeObject, dragConfig }}
+            value={{ objects, addObject, removeObject, dragConfig, gesture }}
         >
-            {children}
+            <GestureDetector gesture={gesture}>{children}</GestureDetector>
         </DragContext.Provider>
     );
 }
@@ -64,9 +73,9 @@ function Draggable({
 }) {
     const ref = useRef<typeof DragControls & Group>(null!);
     const hitBoxRef = useRef<Mesh>(null!);
-    const { objects, addObject, removeObject, dragConfig } =
+    const { objects, addObject, removeObject, gesture, dragConfig } =
         useContext(DragContext);
-    const controlsRef = useContext(ControlsContext);
+    // const controlsRef = useContext(ControlsContext);
 
     const localPosition = new Vector3();
     const previousMatrix = new Matrix4();
@@ -84,6 +93,7 @@ function Draggable({
             ref={ref}
             axisLock="y"
             autoTransform={false}
+            gesture={gesture}
             onDrag={localMatrix => {
                 if (!enabled || !ref.current) return;
                 // clamp position to half
@@ -99,12 +109,12 @@ function Draggable({
             }}
             onDragStart={() => {
                 if (!enabled || !ref.current) return;
-                controlsRef.current.enabled = false;
+                // controlsRef.current.enabled = false;
                 previousMatrix.copy(ref.current.matrix);
             }}
             onDragEnd={() => {
                 if (!hitBoxRef.current || !ref.current) return;
-                controlsRef.current.enabled = true;
+                // controlsRef.current.enabled = true;
                 // check if any objects are colliding
                 const thisBox = new Box3().setFromObject(hitBoxRef.current);
                 const otherBox = new Box3();
