@@ -6,14 +6,14 @@ import { store } from "@/reducers/store";
 import { Canvas } from "@react-three/fiber/native";
 import { OrientationLock, lockAsync } from "expo-screen-orientation";
 import { useEffect } from "react";
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet, Platform } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Provider } from "react-redux";
 
 export default function Index() {
     useEffect(() => {
-        lockAsync(OrientationLock.LANDSCAPE);
-    });
+        if (Platform.OS !== "web") lockAsync(OrientationLock.LANDSCAPE);
+    }, []);
 
     return (
         <Provider store={store}>

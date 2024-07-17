@@ -7,7 +7,7 @@ function HUD() {
     const dispatch = useDispatch();
 
     return (
-        <View>
+        <View style={{ position: "absolute", bottom: 5 }}>
             <Button onPress={() => dispatch(addBuilding({}))}>
                 Build Building
             </Button>

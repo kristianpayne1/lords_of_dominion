@@ -50,7 +50,7 @@ export function DragContextProvider({
             state.filter((obj: Group) => obj.uuid !== object?.uuid),
         );
 
-    const gesture = Gesture.Pan().onUpdate(console.log);
+    const gesture = Gesture.Pan().onUpdate(e => console.log(e));
 
     return (
         <DragContext.Provider
