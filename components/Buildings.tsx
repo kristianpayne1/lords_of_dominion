@@ -1,7 +1,7 @@
-import Draggable, { DragContextProvider } from "./Draggable";
+import Draggable from "./Draggable";
 import { Suspense } from "react";
 import House from "./House";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { Plane } from "@react-three/drei/native";
 import { BuildingType, BuildingTypes, State } from "@/types";
 
@@ -13,8 +13,6 @@ function Building({ type, ...props }: { type: BuildingTypes }) {
 }
 
 function Buildings({ isEditMode = true, age = "FirstAge" }) {
-    const dispatch = useDispatch();
-
     const buildings = useSelector((state: State) => state.buildings);
 
     return (
