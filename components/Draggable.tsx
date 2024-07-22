@@ -4,6 +4,7 @@ import {
     type PropsWithChildren,
     useContext,
     useEffect,
+    useMemo,
     useRef,
     useState,
 } from "react";
@@ -15,48 +16,69 @@ import {
     GestureDetector,
     PanGesture,
 } from "react-native-gesture-handler";
+import { CanvasView, updateCallbackProps } from "./CanvasView";
+import { RootState, useThree } from "@react-three/fiber";
+
+type DragObject = {
+    group: Group;
+    gesture: PanGesture;
+    three: RootState;
+};
 
 type DragContextValue = {
-    objects: Array<Group>;
-    addObject: (object: Group | undefined) => void;
-    removeObject: (object: Group | undefined) => void;
+    objects: Array<DragObject>;
+    addObject: (dragObject: DragObject) => void;
+    removeObject: (uuid: string) => void;
     dragConfig?: DragConfig;
-    gesture: PanGesture | null;
 };
 
 const DragContext = createContext<DragContextValue>({
     objects: [],
     addObject: () => {},
     removeObject: () => {},
-    gesture: null,
 });
 
 function roundHalf(num: number) {
     return Math.round(num * 2) / 2;
 }
 
+function DragView({ group, gesture, three }: DragObject) {
+    const updateCallback = useRef((props: updateCallbackProps) => {});
+
+    useEffect(() => {
+        gesture.onChange(e => console.log(e));
+    }, []);
+
+    return (
+        <GestureDetector gesture={gesture}>
+            <CanvasView {...{ group, three, updateCallback }} />
+        </GestureDetector>
+    );
+}
+
 export function DragContextProvider({
     children,
     ...dragConfig
 }: PropsWithChildren) {
-    const [objects, setObjects] = useState<Array<Group>>([]);
+    const [objects, setObjects] = useState<Array<DragObject>>([]);
 
-    const addObject = (object: Group | undefined) => {
-        if (!object) return;
-        setObjects((state: Array<Group>) => [...state, object]);
+    const addObject = (dragObject: DragObject) => {
+        if (!dragObject) return;
+        setObjects((state: Array<DragObject>) => [...state, dragObject]);
     };
-    const removeObject = (object: Group | undefined) =>
+    const removeObject = (uuid: string) =>
         setObjects(state =>
-            state.filter((obj: Group) => obj.uuid !== object?.uuid),
+            state.filter(({ group: object }) => uuid !== object?.uuid),
         );
-
-    const gesture = Gesture.Pan().onUpdate(e => console.log(e));
 
     return (
         <DragContext.Provider
-            value={{ objects, addObject, removeObject, dragConfig, gesture }}
+            value={{ objects, addObject, removeObject, dragConfig }}
         >
-            <GestureDetector gesture={gesture}>{children}</GestureDetector>
+            {children}
+            {objects.map((props, key) => (
+                <DragView {...{ key, ...props }} />
+            ))}
         </DragContext.Provider>
     );
 }
@@ -72,18 +94,27 @@ function Draggable({
 }) {
     const ref = useRef<typeof DragControls & Group>(null!);
     const hitBoxRef = useRef<Mesh>(null!);
-    const { objects, addObject, removeObject, gesture, dragConfig } =
+    const { objects, addObject, removeObject, dragConfig } =
         useContext(DragContext);
+
+    const three = useThree();
+
     // const controlsRef = useContext(ControlsContext);
 
     const localPosition = new Vector3();
     const previousMatrix = new Matrix4();
 
+    const gesture = useMemo(() => Gesture.Pan(), []);
+
     useEffect(() => {
         if (!ref.current) return;
-        addObject(ref.current);
+        addObject({
+            group: ref.current,
+            gesture,
+            three,
+        });
         return () => {
-            removeObject(ref.current);
+            removeObject(ref.current.uuid);
         };
     }, [ref.current]);
 
@@ -118,9 +149,9 @@ function Draggable({
                 const thisBox = new Box3().setFromObject(hitBoxRef.current);
                 const otherBox = new Box3();
                 const collides = objects.some(
-                    object =>
-                        object.uuid !== ref.current?.uuid &&
-                        thisBox.intersectsBox(otherBox.setFromObject(object)),
+                    ({ group }) =>
+                        group.uuid !== ref.current?.uuid &&
+                        thisBox.intersectsBox(otherBox.setFromObject(group)),
                 );
                 if (collides) ref.current.matrix.copy(previousMatrix);
             }}

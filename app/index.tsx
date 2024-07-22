@@ -27,6 +27,7 @@ export default function Index() {
                             orthographic
                             camera={{ zoom: 100, position: [10, 10, 10] }}
                             shadows
+                            pointerEvents="none"
                         >
                             <Game />
                             <ambientLight intensity={1} />
